@@ -1,0 +1,47 @@
+--- select CustomerCode, FIrstName, LastName clients whic Firstnam contains "el 
+
+
+--- select CustomerCode, FIrstName, LastName of the client wich has a name starting in
+--"J" 
+
+
+--- Now we have a Italian speaking marketing director, he really does't like to speak Eglish.
+--  using an union (either if that is not the best performing tehnique for this
+-- exercise) clause, make a report that aggregates the precedent two 
+-- (you should have a report of  5 records
+-- you have to rename : 
+--CustomerCode -- > CodiceCliente
+-- FirstName --> Nome
+-- Lastname -->  Cognome
+
+
+-- you want to avoid the union clause in the precedent exercise,
+-- so produce excaxt the same report without using any 
+
+
+
+-- produce all the informations (*) of the customers
+-- that are born after 1992 02 02
+
+
+-- select the CustomerCode and add a field 
+-- that indicates, call it 'Category' if a cuseomt is "Senior"  if born before 1992-02-02
+-- and "Junior" if 
+
+
+-- using a left join add to the precedent report 
+-- a columns that shows all current account id 
+-- tip the join is on CustomerCOde
+
+
+-- look at the precedent report, pick the 
+-- pick the correct join to avoid the missing  value in the Accountnumber
+
+
+-- from the precedent report only the Senior
+ 
+
+
+-- from the precedent report, avoid to select only the 'Senior'
+-- but order in a manner that you have jinior in first lines  and Seniors in last line 
+ 
