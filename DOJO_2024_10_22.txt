@@ -1,0 +1,150 @@
+When discussing integrity constraints in SQL, you can break it down into the following topics:
+Primary Key, Foreign Key, Unique, Not Null, and Check constraints. 
+Let's walk through an example based on the provided code and explain how different constraints play a role.
+
+Key Concepts for the Lesson:
+	Primary Key Constraint:
+	Ensures that each record in the table is unique and identifiable. A common use case is having a unique AccountID for every account.
+	Example: In AccountDetails, AccountID might be used as a primary key.
+	
+	Foreign Key Constraint:
+	Ensures that values in one table correspond to values in another table. 
+	For example, CustomerCode in AccountDetails references CustomerDetails(CustomerCode).
+	Why important: It prevents orphaned records. For example, you can't have an account linked to a non-existent customer.
+	
+	Unique Constraint:
+	Ensures that all values in a column or a group of columns are distinct. 
+	For example, AccountNumber might be unique to avoid multiple accounts with the same number.
+	Not Null Constraint:
+
+	Ensures that a column cannot contain NULL values, meaning the value must always be provided.
+	For example, Balance and OpeningDate are NOT NULL in the AccountDetails table.
+	
+	Check Constraint:
+	Used to enforce domain integrity by limiting the values that can be placed in a column. 
+	For instance, you could ensure that Balance must be greater than or equal to zero.
+	
+	
+---
+
+Here’s a table to demonstrate different types of integrity constraints using financial asset information 
+such as ISIN (International Securities Identification Number),
+ market value, and asset type. Let's create this table from scratch and get some practical examples.
+
+Step 1: Create the Financial Asset Table
+We will create a table called FinancialAssets with the following constraints:
+
+Primary Key: On the AssetID to ensure each record is unique.
+Not Null: On important fields like ISIN, MarketValue, and AssetType.
+Unique: To ensure that each ISIN (which is a unique identifier for financial assets) is not repeated.
+Check: To ensure the market value is non-negative.
+Foreign Key: For example, linking to a table that could store asset categories (not necessary for this example but will be referenced).
+sql
+----COPY CODE FROM HERE UNTILL THE SEMICOLON
+CREATE TABLE FinancialAssets (
+    AssetID INTEGER PRIMARY KEY AUTOINCREMENT,
+    ISIN TEXT NOT NULL UNIQUE,
+    AssetName TEXT NOT NULL,
+    AssetType TEXT NOT NULL,
+    MarketValue REAL NOT NULL CHECK (MarketValue >= 0),
+    IssueDate DATE,
+    CurrencyCode TEXT NOT NULL CHECK (LENGTH(CurrencyCode) = 3) -- Currency must follow ISO 4217 (e.g. USD, EUR)
+);
+AssetID: A unique identifier for each asset.
+ISIN: International Securities Identification Number, a globally unique identifier for securities.
+AssetName: Name of the financial asset (e.g., “Apple Stock”).
+AssetType: Type of asset (e.g., stock, bond).
+MarketValue: The current market value of the asset. The CHECK (MarketValue >= 0) ensures no negative market value.
+IssueDate: Date the asset was issued.
+CurrencyCode: Currency for the market value, limited to exactly 3 characters (e.g., USD, EUR).
+Step 2: Practical Examples of Constraints
+1. Primary Key Constraint: Unique AssetID
+Each row in the FinancialAssets table has a unique AssetID.
+
+Example: Attempting to insert the same AssetID will fail.
+sql
+---RUN THIS OCODE
+INSERT INTO FinancialAssets (AssetID, ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+VALUES (1, 'US0378331005', 'Apple Stock', 'Stock', 150.75, 'USD');
+
+-- RUN THIS CODE (it fails... why? )
+INSERT INTO FinancialAssets (AssetID, ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+VALUES (1, 'US5949181045', 'Microsoft Stock', 'Stock', 250.45, 'USD');
+Expected Outcome: The second insert will fail due to ----?
+
+
+
+--- Exercise: 
+run the precedente statement (with microsoft stock') and modifiy the value of "wich field?" 
+to let the code work 
+ 
+
+
+
+2. Not Null Constraint: Important Fields Cannot Be Null
+Fields like ISIN, MarketValue, AssetType, and CurrencyCode cannot be null, ensuring these critical details are always provided.
+
+Example: Attempting to insert without MarketValue will fail.
+sql
+COPY THIS CODE AS EXAMPLE
+-- Inserting without MarketValue will fail
+INSERT INTO FinancialAssets (ISIN, AssetName, AssetType, CurrencyCode)
+VALUES ('US5949181045', 'Microsoft Stock', 'Stock', 'USD');
+Expected Outcome: This will fail due to the NOT NULL constraint on MarketValue.
+
+3. Unique Constraint: Unique ISIN
+The ISIN must be unique, ensuring that no two assets share the same identifier.
+
+Example: Attempting to insert a duplicate ISIN will fail.
+sql
+COPY THIS CODE AS EXAMPLE
+INSERT INTO FinancialAssets (ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+VALUES ('US0378331005', 'Apple Stock', 'Stock', 150.75, 'USD');
+
+-- Trying to insert the same ISIN will fail
+INSERT INTO FinancialAssets (ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+COPY THIS CODE AS EXAMPLE
+VALUES ('US0378331005', 'Duplicate Apple Stock', 'Stock', 180.00, 'USD');
+Expected Outcome: The second insert will fail due to a violation of the Unique constraint on ISIN.
+
+4. Check Constraint: Market Value Should Be Non-Negative
+The MarketValue must be non-negative, preventing invalid data.
+
+Example: Inserting a negative market value will fail.
+sql
+COPY THIS CODE AS EXAMPLE
+-- Trying to insert a negative market value will fail
+INSERT INTO FinancialAssets (ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+VALUES ('US88160R1014', 'Tesla Stock', 'Stock', -500.00, 'USD');
+Expected Outcome: This will fail due to the Check constraint (MarketValue >= 0).
+
+5. Check Constraint: Currency Code Must Be 3 Characters
+The CurrencyCode must follow the ISO 4217 format (exactly 3 characters, like USD, EUR, etc.).
+
+Example: Attempting to insert an invalid CurrencyCode (e.g., with 4 characters) will fail.
+sql
+COPY THIS CODE AS EXAMPLE
+-- Inserting a CurrencyCode with 4 characters will fail
+INSERT INTO FinancialAssets (ISIN, AssetName, AssetType, MarketValue, CurrencyCode)
+VALUES ('CA1234567890', 'Canadian Bond', 'Bond', 1000.00, 'USDX');
+Expected Outcome: This will fail due to the Check constraint on CurrencyCode.
+
+Step 3: Exercise Scenarios
+Primary Key and Unique Constraint:
+
+Insert a few financial assets into the FinancialAssets table. Then, attempt to insert another asset with the same ISIN to demonstrate the Unique constraint and try using the same AssetID to show the Primary Key violation.
+Not Null Constraint:
+
+Attempt to insert an asset with missing fields, such as MarketValue or ISIN, to show how the Not Null constraint ensures that critical information is always provided.
+Check Constraint:
+
+Insert an asset with a negative market value to demonstrate the Check constraint. Also, try using an invalid CurrencyCode (more than 3 characters) to show how the system enforces valid data.
+Data Integrity and Validations:
+
+
+
+
+
+
+
+	
